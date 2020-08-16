@@ -1,15 +1,12 @@
 import express, { Request, Response } from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
-import dotenv from 'dotenv'
 import helmet from 'helmet'
 import GithubControlller from './controllers/GithubControlller'
 import TrellosController from './controllers/TrelloController'
 
 const githubControlller = new GithubControlller()
 const trelloController = new TrellosController()
-
-dotenv.config()
 
 const app = express()
 

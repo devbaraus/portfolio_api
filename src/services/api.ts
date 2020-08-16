@@ -1,7 +1,7 @@
 import axios, { AxiosBasicCredentials } from 'axios'
-import dotenv from 'dotenv'
-
-dotenv.config()
+// import dotenv from 'dotenv'
+//
+// dotenv.config()
 
 export const trelloAPI = axios.create({
   baseURL: 'https://api.trello.com/1/',
