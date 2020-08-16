@@ -44,6 +44,20 @@ class TrelloController {
     }
     return projects
   }
+  async listAllArticles(req: Request, res: Response) {
+    const q = req.query
+    try {
+      const data = (await trelloAPI.get(`lists/${blogID}/cards`)).data.splice(
+        Number(q.page) * 10,
+        10,
+      )
+
+      res.json(data.map((side: ProjectInterface) => side.id))
+    } catch (e) {
+      console.log(e)
+      return res.sendStatus(400)
+    }
+  }
   async indexAllArticles(req: Request, res: Response) {
     const q = req.query
 
@@ -68,7 +82,20 @@ class TrelloController {
       res.sendStatus(400)
     }
   }
-  async indexAllProject(req: Request, res: Response) {
+  async listAllProjects(req: Request, res: Response) {
+    const q = req.query
+    try {
+      const data = (
+        await trelloAPI.get(`lists/${projectsID}/cards`)
+      ).data.splice(Number(q.page) * 10, 10)
+
+      res.json(data.map((side: ProjectInterface) => side.id))
+    } catch (e) {
+      console.log(e)
+      return res.sendStatus(400)
+    }
+  }
+  async indexAllProjects(req: Request, res: Response) {
     const q = req.query
     try {
       const data = (
@@ -90,7 +117,21 @@ class TrelloController {
       return res.sendStatus(400)
     }
   }
-  async indexAllSide(req: Request, res: Response) {
+  async listAllSides(req: Request, res: Response) {
+    const q = req.query
+    try {
+      const data = (await trelloAPI.get(`lists/${sideID}/cards`)).data.splice(
+        Number(q.page) * 10,
+        10,
+      )
+
+      res.json(data.map((side: ProjectInterface) => side.id))
+    } catch (e) {
+      console.log(e)
+      return res.sendStatus(400)
+    }
+  }
+  async indexAllSides(req: Request, res: Response) {
     const q = req.query
     try {
       const data = (await trelloAPI.get(`lists/${sideID}/cards`)).data.splice(
@@ -106,7 +147,7 @@ class TrelloController {
       return res.sendStatus(400)
     }
   }
-  async indeSide(req: Request, res: Response) {
+  async indexSide(req: Request, res: Response) {
     const { id } = req.params
     try {
     } catch (e) {

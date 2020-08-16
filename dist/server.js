@@ -24,6 +24,6 @@ app
     .get('/projects/:id', trelloController.indexProject)
     .get('/sides/', trelloController.indexAllSide)
     .get('/sides/:id', trelloController.indeSide);
-app.listen(process.env.PORT, function () {
-    console.log("Server running at " + process.env.PORT);
+app.listen(process.env.PORT || 3333, function () {
+    console.log("Server running at " + (process.env.PORT || 3333));
 });
