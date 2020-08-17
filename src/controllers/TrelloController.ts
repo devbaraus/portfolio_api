@@ -171,13 +171,25 @@ class TrelloController {
 
       let images: Array<any> = []
 
+      let contents: Array<any> = []
+
       attachments.map((attach: { previews: []; name: string; url: string }) => {
         if (attach.name === 'url') {
           url = attach.url
           return null
         }
 
-        if (attach.name === 'cover') return null
+        if (attach.name.startsWith('content:')) {
+          contents.push({
+            name: attach.name.replace('content:', ''),
+            url: attach.url,
+          })
+          return null
+        }
+
+        if (attach.name === 'logo') {
+          return null
+        }
 
         let k = { w: 10000, url: '' }
 
@@ -199,6 +211,7 @@ class TrelloController {
         labels,
         images,
         url,
+        contents,
         description: desc,
       })
     } catch (e) {

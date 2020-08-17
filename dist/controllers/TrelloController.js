@@ -285,7 +285,7 @@ var TrelloController = /** @class */ (function () {
     };
     TrelloController.prototype.indexSide = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var id, _a, name_2, labels, cover, desc, k_1, attachments, url_1, images_1, e_7;
+            var id, _a, name_2, labels, cover, desc, k_1, attachments, url_1, images_1, contents_1, e_7;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -308,13 +308,22 @@ var TrelloController = /** @class */ (function () {
                         attachments = (_b.sent()).data;
                         url_1 = '';
                         images_1 = [];
+                        contents_1 = [];
                         attachments.map(function (attach) {
                             if (attach.name === 'url') {
                                 url_1 = attach.url;
                                 return null;
                             }
-                            if (attach.name === 'cover')
+                            if (attach.name.startsWith('content:')) {
+                                contents_1.push({
+                                    name: attach.name.replace('content:', ''),
+                                    url: attach.url,
+                                });
                                 return null;
+                            }
+                            if (attach.name === 'logo') {
+                                return null;
+                            }
                             var k = { w: 10000, url: '' };
                             attach.previews.map(function (i) {
                                 if (i.width < k.w && i.width > 900)
@@ -333,6 +342,7 @@ var TrelloController = /** @class */ (function () {
                             labels: labels,
                             images: images_1,
                             url: url_1,
+                            contents: contents_1,
                             description: desc,
                         });
                         return [3 /*break*/, 5];
