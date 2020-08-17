@@ -41,12 +41,43 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var api_1 = require("../services/api");
 var axios_1 = __importDefault(require("axios"));
+var GITHUB_USERNAME = process.env.GITHUB_USERNAME;
 var GithubControlller = /** @class */ (function () {
     function GithubControlller() {
     }
+    GithubControlller.prototype.listAll = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, _b, per_page, _c, page, _d, sort, data, e_1;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
+                    case 0:
+                        _a = req.query, _b = _a.per_page, per_page = _b === void 0 ? 10 : _b, _c = _a.page, page = _c === void 0 ? 1 : _c, _d = _a.sort, sort = _d === void 0 ? 'updated' : _d;
+                        _e.label = 1;
+                    case 1:
+                        _e.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, api_1.gitAPI.get("users/" + GITHUB_USERNAME + "/repos", {
+                                params: {
+                                    per_page: per_page,
+                                    sort: sort,
+                                    page: page,
+                                },
+                            })];
+                    case 2:
+                        data = (_e.sent()).data;
+                        res.json(data.map(function (repo) { return repo.name; }));
+                        return [3 /*break*/, 4];
+                    case 3:
+                        e_1 = _e.sent();
+                        console.log(e_1);
+                        return [2 /*return*/, res.sendStatus(400)];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
     GithubControlller.prototype.indexAll = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, _b, per_page, _c, page, _d, sort, data, repos, _e, _f, _i, index, _g, name_1, html_url, description, clone_url, _h, _j, _k, _l, _m, e_1;
+            var _a, _b, per_page, _c, page, _d, sort, data, repos, _e, _f, _i, index, _g, name_1, html_url, description, clone_url, _h, _j, _k, _l, _m, e_2;
             return __generator(this, function (_o) {
                 switch (_o.label) {
                     case 0:
@@ -54,7 +85,7 @@ var GithubControlller = /** @class */ (function () {
                         _o.label = 1;
                     case 1:
                         _o.trys.push([1, 7, , 8]);
-                        return [4 /*yield*/, api_1.gitAPI.get('users/devbaraus/repos', {
+                        return [4 /*yield*/, api_1.gitAPI.get("users/" + GITHUB_USERNAME + "/repos", {
                                 params: {
                                     per_page: per_page,
                                     sort: sort,
@@ -81,9 +112,10 @@ var GithubControlller = /** @class */ (function () {
                             clone_url: clone_url
                         };
                         _m = (_l = Object).keys;
-                        return [4 /*yield*/, api_1.gitAPI.get("repos/devbaraus/" + name_1 + "/languages")];
+                        return [4 /*yield*/, api_1.gitAPI.get("repos/" + GITHUB_USERNAME + "/" + name_1 + "/languages")];
                     case 4:
-                        _j.apply(_h, [(_k.languages = _m.apply(_l, [(_o.sent()).data]),
+                        _j.apply(_h, [(_k.languages = _m.apply(_l, [(_o.sent())
+                                    .data]),
                                 _k)]);
                         _o.label = 5;
                     case 5:
@@ -93,8 +125,8 @@ var GithubControlller = /** @class */ (function () {
                         res.json(repos);
                         return [3 /*break*/, 8];
                     case 7:
-                        e_1 = _o.sent();
-                        console.log(e_1);
+                        e_2 = _o.sent();
+                        console.log(e_2);
                         return [2 /*return*/, res.sendStatus(400)];
                     case 8: return [2 /*return*/];
                 }
@@ -103,37 +135,49 @@ var GithubControlller = /** @class */ (function () {
     };
     GithubControlller.prototype.index = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var name, _a, html_url, description, clone_url, languages, _b, _c, read_me, e_2;
+            var name, _a, html_url_1, description_1, clone_url_1, languages_1, _b, _c, e_3;
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:
                         name = req.params.name;
                         _d.label = 1;
                     case 1:
-                        _d.trys.push([1, 5, , 6]);
-                        return [4 /*yield*/, api_1.gitAPI.get("repos/devbaraus/" + name)];
+                        _d.trys.push([1, 4, , 5]);
+                        return [4 /*yield*/, api_1.gitAPI.get("repos/" + GITHUB_USERNAME + "/" + name)];
                     case 2:
-                        _a = (_d.sent()).data, html_url = _a.html_url, description = _a.description, clone_url = _a.clone_url;
+                        _a = (_d.sent()).data, html_url_1 = _a.html_url, description_1 = _a.description, clone_url_1 = _a.clone_url;
                         _c = (_b = Object).keys;
-                        return [4 /*yield*/, api_1.gitAPI.get("repos/devbaraus/" + name + "/languages")];
+                        return [4 /*yield*/, api_1.gitAPI.get("repos/" + GITHUB_USERNAME + "/" + name + "/languages")];
                     case 3:
-                        languages = _c.apply(_b, [(_d.sent()).data]);
-                        return [4 /*yield*/, axios_1.default.get("https://raw.githubusercontent.com/devbaraus/" + name + "/master/README.md")];
-                    case 4:
-                        read_me = (_d.sent()).data;
-                        res.json({
-                            name: name,
-                            html_url: html_url,
-                            description: description,
-                            clone_url: clone_url,
-                            languages: languages,
-                            read_me: read_me,
+                        languages_1 = _c.apply(_b, [(_d.sent()).data]);
+                        axios_1.default
+                            .get("https://raw.githubusercontent.com/" + GITHUB_USERNAME + "/" + name + "/master/README.md")
+                            .then(function (response) {
+                            return res.json({
+                                name: name,
+                                html_url: html_url_1,
+                                description: description_1,
+                                clone_url: clone_url_1,
+                                languages: languages_1,
+                                read_me: response.data,
+                            });
+                        })
+                            .catch(function (e) {
+                            return res.json({
+                                name: name,
+                                html_url: html_url_1,
+                                description: description_1,
+                                clone_url: clone_url_1,
+                                languages: languages_1,
+                                read_me: '',
+                            });
                         });
-                        return [3 /*break*/, 6];
-                    case 5:
-                        e_2 = _d.sent();
+                        return [3 /*break*/, 5];
+                    case 4:
+                        e_3 = _d.sent();
+                        console.log(e_3);
                         return [2 /*return*/, res.sendStatus(400)];
-                    case 6: return [2 /*return*/];
+                    case 5: return [2 /*return*/];
                 }
             });
         });

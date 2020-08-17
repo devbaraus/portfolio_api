@@ -17,13 +17,17 @@ app.use(morgan_1.default('tiny'));
 app.use(helmet_1.default());
 app
     .get('/repos/', githubControlller.indexAll)
+    .get('/list/repos', githubControlller.listAll)
     .get('/repos/:name', githubControlller.index)
     .get('/articles/', trelloController.indexAllArticles)
+    .get('/list/articles', trelloController.listAllArticles)
     .get('/articles/:id', trelloController.indexArticle)
-    .get('/projects/', trelloController.indexAllProject)
+    .get('/projects/', trelloController.indexAllProjects)
+    .get('/list/projects', trelloController.listAllProjects)
     .get('/projects/:id', trelloController.indexProject)
-    .get('/sides/', trelloController.indexAllSide)
-    .get('/sides/:id', trelloController.indeSide);
+    .get('/sides/', trelloController.indexAllSides)
+    .get('/list/sides', trelloController.indexAllSides)
+    .get('/sides/:id', trelloController.indexSide);
 app.listen(process.env.PORT || 3333, function () {
     console.log("Server running at " + (process.env.PORT || 3333));
 });

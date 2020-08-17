@@ -24,14 +24,16 @@ class TrelloController {
 
       labels = labels.map((label: { name: string }) => label.name)
 
-      let k = { w: 10000, url: 'dawdw' }
-      let attachment = (
-        await trelloAPI.get(`cards/${id}/attachments/${cover.idAttachment}`)
-      ).data
+      let k = { w: 10000, url: '' }
+      let attachments = (await trelloAPI.get(`cards/${id}/attachments/`)).data
 
-      attachment.previews.map((i: { width: number; url: string }) => {
-        if (i.width < k.w && i.width > 300) k = { w: i.width, url: i.url }
-        return i
+      attachments.map((attach: { previews: []; name: string }) => {
+        if (attach.name === 'cover')
+          return attach.previews.map((i: { width: number; url: string }) => {
+            if (i.width < k.w && i.width > 300) k = { w: i.width, url: i.url }
+            return i
+          })
+        return
       })
 
       projects.push({
@@ -150,7 +152,57 @@ class TrelloController {
   async indexSide(req: Request, res: Response) {
     const { id } = req.params
     try {
+      let { name, labels, cover, desc } = (
+        await trelloAPI.get(`cards/${id}`)
+      ).data
+
+      labels = labels.map((label: { name: string }) => label.name)
+
+      let k = { w: 10000, url: '' }
+
+      cover.scaled.map((i: { width: number; url: string }) => {
+        if (i.width < k.w && i.width > 900) k = { w: i.width, url: i.url }
+        return i
+      })
+
+      let attachments = (await trelloAPI.get(`cards/${id}/attachments`)).data
+
+      let url = ''
+
+      let images: Array<any> = []
+
+      attachments.map((attach: { previews: []; name: string; url: string }) => {
+        if (attach.name === 'url') {
+          url = attach.url
+          return null
+        }
+
+        if (attach.name === 'cover') return null
+
+        let k = { w: 10000, url: '' }
+
+        attach.previews.map((i: { width: number; url: string }) => {
+          if (i.width < k.w && i.width > 900) k = { w: i.width, url: i.url }
+          return i
+        })
+
+        images.push({
+          name: attach.name,
+          url: k.url,
+        })
+      })
+
+      res.json({
+        id,
+        name,
+        cover: k.url,
+        labels,
+        images,
+        url,
+        description: desc,
+      })
     } catch (e) {
+      console.log(e)
       return res.sendStatus(400)
     }
   }

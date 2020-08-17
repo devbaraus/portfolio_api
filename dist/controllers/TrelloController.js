@@ -53,20 +53,24 @@ var TrelloController = /** @class */ (function () {
                     case 0:
                         projects = [];
                         _loop_1 = function (index) {
-                            var _a, id, name_1, shortUrl, labels, cover, k, attachment;
+                            var _a, id, name_1, shortUrl, labels, cover, k, attachments;
                             return __generator(this, function (_b) {
                                 switch (_b.label) {
                                     case 0:
                                         _a = arr[index], id = _a.id, name_1 = _a.name, shortUrl = _a.shortUrl, labels = _a.labels, cover = _a.cover;
                                         labels = labels.map(function (label) { return label.name; });
-                                        k = { w: 10000, url: 'dawdw' };
-                                        return [4 /*yield*/, api_1.trelloAPI.get("cards/" + id + "/attachments/" + cover.idAttachment)];
+                                        k = { w: 10000, url: '' };
+                                        return [4 /*yield*/, api_1.trelloAPI.get("cards/" + id + "/attachments/")];
                                     case 1:
-                                        attachment = (_b.sent()).data;
-                                        attachment.previews.map(function (i) {
-                                            if (i.width < k.w && i.width > 300)
-                                                k = { w: i.width, url: i.url };
-                                            return i;
+                                        attachments = (_b.sent()).data;
+                                        attachments.map(function (attach) {
+                                            if (attach.name === 'cover')
+                                                return attach.previews.map(function (i) {
+                                                    if (i.width < k.w && i.width > 300)
+                                                        k = { w: i.width, url: i.url };
+                                                    return i;
+                                                });
+                                            return;
                                         });
                                         projects.push({
                                             id: id,
@@ -99,9 +103,33 @@ var TrelloController = /** @class */ (function () {
             });
         });
     };
+    TrelloController.prototype.listAllArticles = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var q, data, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        q = req.query;
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, api_1.trelloAPI.get("lists/" + blogID + "/cards")];
+                    case 2:
+                        data = (_a.sent()).data.splice(Number(q.page) * 10, 10);
+                        res.json(data.map(function (side) { return side.id; }));
+                        return [3 /*break*/, 4];
+                    case 3:
+                        e_1 = _a.sent();
+                        console.log(e_1);
+                        return [2 /*return*/, res.sendStatus(400)];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
     TrelloController.prototype.indexAllArticles = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var q, data, articles, e_1;
+            var q, data, articles, e_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -118,8 +146,8 @@ var TrelloController = /** @class */ (function () {
                         res.json(articles);
                         return [3 /*break*/, 5];
                     case 4:
-                        e_1 = _a.sent();
-                        console.log(e_1);
+                        e_2 = _a.sent();
+                        console.log(e_2);
                         res.sendStatus(400);
                         return [3 /*break*/, 5];
                     case 5: return [2 /*return*/];
@@ -140,9 +168,33 @@ var TrelloController = /** @class */ (function () {
             });
         });
     };
-    TrelloController.prototype.indexAllProject = function (req, res) {
+    TrelloController.prototype.listAllProjects = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var q, data, projects, e_2;
+            var q, data, e_3;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        q = req.query;
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, api_1.trelloAPI.get("lists/" + projectsID + "/cards")];
+                    case 2:
+                        data = (_a.sent()).data.splice(Number(q.page) * 10, 10);
+                        res.json(data.map(function (side) { return side.id; }));
+                        return [3 /*break*/, 4];
+                    case 3:
+                        e_3 = _a.sent();
+                        console.log(e_3);
+                        return [2 /*return*/, res.sendStatus(400)];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    TrelloController.prototype.indexAllProjects = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var q, data, projects, e_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -159,8 +211,8 @@ var TrelloController = /** @class */ (function () {
                         res.json(projects);
                         return [3 /*break*/, 5];
                     case 4:
-                        e_2 = _a.sent();
-                        console.log(e_2);
+                        e_4 = _a.sent();
+                        console.log(e_4);
                         return [2 /*return*/, res.sendStatus(400)];
                     case 5: return [2 /*return*/];
                 }
@@ -181,9 +233,33 @@ var TrelloController = /** @class */ (function () {
             });
         });
     };
-    TrelloController.prototype.indexAllSide = function (req, res) {
+    TrelloController.prototype.listAllSides = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var q, data, sides, e_3;
+            var q, data, e_5;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        q = req.query;
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, api_1.trelloAPI.get("lists/" + sideID + "/cards")];
+                    case 2:
+                        data = (_a.sent()).data.splice(Number(q.page) * 10, 10);
+                        res.json(data.map(function (side) { return side.id; }));
+                        return [3 /*break*/, 4];
+                    case 3:
+                        e_5 = _a.sent();
+                        console.log(e_5);
+                        return [2 /*return*/, res.sendStatus(400)];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    TrelloController.prototype.indexAllSides = function (req, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var q, data, sides, e_6;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -200,25 +276,73 @@ var TrelloController = /** @class */ (function () {
                         res.json(sides);
                         return [3 /*break*/, 5];
                     case 4:
-                        e_3 = _a.sent();
-                        console.log(e_3);
+                        e_6 = _a.sent();
+                        console.log(e_6);
                         return [2 /*return*/, res.sendStatus(400)];
                     case 5: return [2 /*return*/];
                 }
             });
         });
     };
-    TrelloController.prototype.indeSide = function (req, res) {
+    TrelloController.prototype.indexSide = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var id;
-            return __generator(this, function (_a) {
-                id = req.params.id;
-                try {
+            var id, _a, name_2, labels, cover, desc, k_1, attachments, url_1, images_1, e_7;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        id = req.params.id;
+                        _b.label = 1;
+                    case 1:
+                        _b.trys.push([1, 4, , 5]);
+                        return [4 /*yield*/, api_1.trelloAPI.get("cards/" + id)];
+                    case 2:
+                        _a = (_b.sent()).data, name_2 = _a.name, labels = _a.labels, cover = _a.cover, desc = _a.desc;
+                        labels = labels.map(function (label) { return label.name; });
+                        k_1 = { w: 10000, url: '' };
+                        cover.scaled.map(function (i) {
+                            if (i.width < k_1.w && i.width > 900)
+                                k_1 = { w: i.width, url: i.url };
+                            return i;
+                        });
+                        return [4 /*yield*/, api_1.trelloAPI.get("cards/" + id + "/attachments")];
+                    case 3:
+                        attachments = (_b.sent()).data;
+                        url_1 = '';
+                        images_1 = [];
+                        attachments.map(function (attach) {
+                            if (attach.name === 'url') {
+                                url_1 = attach.url;
+                                return null;
+                            }
+                            if (attach.name === 'cover')
+                                return null;
+                            var k = { w: 10000, url: '' };
+                            attach.previews.map(function (i) {
+                                if (i.width < k.w && i.width > 900)
+                                    k = { w: i.width, url: i.url };
+                                return i;
+                            });
+                            images_1.push({
+                                name: attach.name,
+                                url: k.url,
+                            });
+                        });
+                        res.json({
+                            id: id,
+                            name: name_2,
+                            cover: k_1.url,
+                            labels: labels,
+                            images: images_1,
+                            url: url_1,
+                            description: desc,
+                        });
+                        return [3 /*break*/, 5];
+                    case 4:
+                        e_7 = _b.sent();
+                        console.log(e_7);
+                        return [2 /*return*/, res.sendStatus(400)];
+                    case 5: return [2 /*return*/];
                 }
-                catch (e) {
-                    return [2 /*return*/, res.sendStatus(400)];
-                }
-                return [2 /*return*/];
             });
         });
     };
