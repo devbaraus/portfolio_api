@@ -187,7 +187,7 @@ class TrelloController {
           return null
         }
 
-        if (attach.name === 'logo') {
+        if (['logo', 'cover'].includes(attach.name)) {
           return null
         }
 

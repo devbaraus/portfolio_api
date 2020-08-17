@@ -321,7 +321,7 @@ var TrelloController = /** @class */ (function () {
                                 });
                                 return null;
                             }
-                            if (attach.name === 'logo') {
+                            if (['logo', 'cover'].includes(attach.name)) {
                                 return null;
                             }
                             var k = { w: 10000, url: '' };
