@@ -121,7 +121,7 @@ var TrelloController = /** @class */ (function () {
                     case 3:
                         e_1 = _a.sent();
                         console.log(e_1);
-                        return [2 /*return*/, res.sendStatus(400)];
+                        return [2 /*return*/, res.status(400).json({ error: e_1.message })];
                     case 4: return [2 /*return*/];
                 }
             });
@@ -148,8 +148,7 @@ var TrelloController = /** @class */ (function () {
                     case 4:
                         e_2 = _a.sent();
                         console.log(e_2);
-                        res.sendStatus(400);
-                        return [3 /*break*/, 5];
+                        return [2 /*return*/, res.status(400).json({ error: e_2.message })];
                     case 5: return [2 /*return*/];
                 }
             });
@@ -162,7 +161,7 @@ var TrelloController = /** @class */ (function () {
                 }
                 catch (e) {
                     console.log(e);
-                    res.sendStatus(400);
+                    return [2 /*return*/, res.status(400).json({ error: e.message })];
                 }
                 return [2 /*return*/];
             });
@@ -186,7 +185,7 @@ var TrelloController = /** @class */ (function () {
                     case 3:
                         e_3 = _a.sent();
                         console.log(e_3);
-                        return [2 /*return*/, res.sendStatus(400)];
+                        return [2 /*return*/, res.status(400).json({ error: e_3.message })];
                     case 4: return [2 /*return*/];
                 }
             });
@@ -213,7 +212,7 @@ var TrelloController = /** @class */ (function () {
                     case 4:
                         e_4 = _a.sent();
                         console.log(e_4);
-                        return [2 /*return*/, res.sendStatus(400)];
+                        return [2 /*return*/, res.status(400).json({ error: e_4.message })];
                     case 5: return [2 /*return*/];
                 }
             });
@@ -227,7 +226,7 @@ var TrelloController = /** @class */ (function () {
                 try {
                 }
                 catch (e) {
-                    return [2 /*return*/, res.sendStatus(400)];
+                    return [2 /*return*/, res.status(400).json({ error: e.message })];
                 }
                 return [2 /*return*/];
             });
@@ -251,7 +250,7 @@ var TrelloController = /** @class */ (function () {
                     case 3:
                         e_5 = _a.sent();
                         console.log(e_5);
-                        return [2 /*return*/, res.sendStatus(400)];
+                        return [2 /*return*/, res.status(400).json({ error: e_5.message })];
                     case 4: return [2 /*return*/];
                 }
             });
@@ -278,7 +277,7 @@ var TrelloController = /** @class */ (function () {
                     case 4:
                         e_6 = _a.sent();
                         console.log(e_6);
-                        return [2 /*return*/, res.sendStatus(400)];
+                        return [2 /*return*/, res.status(400).json({ error: e_6.message })];
                     case 5: return [2 /*return*/];
                 }
             });
@@ -340,7 +339,7 @@ var TrelloController = /** @class */ (function () {
                     case 4:
                         e_7 = _b.sent();
                         console.log(e_7);
-                        return [2 /*return*/, res.sendStatus(400)];
+                        return [2 /*return*/, res.status(400).json({ error: e_7.message })];
                     case 5: return [2 /*return*/];
                 }
             });

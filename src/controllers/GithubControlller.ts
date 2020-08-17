@@ -30,7 +30,7 @@ class GithubControlller {
       res.json(data.map((repo: RepositoryInterface) => repo.name))
     } catch (e) {
       console.log(e)
-      return res.sendStatus(400)
+      return res.status(400).json({ error: e.message })
     }
   }
   async indexAll(req: Request, res: Response) {
@@ -63,8 +63,7 @@ class GithubControlller {
       }
       res.json(repos)
     } catch (e) {
-      console.log(e)
-      return res.sendStatus(400)
+      return res.status(400).json({ error: e.message })
     }
   }
   async index(req: Request, res: Response) {
@@ -105,7 +104,7 @@ class GithubControlller {
         })
     } catch (e) {
       console.log(e)
-      return res.sendStatus(400)
+      return res.status(400).json({ error: e.message })
     }
   }
 }

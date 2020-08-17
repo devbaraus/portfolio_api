@@ -69,7 +69,7 @@ var GithubControlller = /** @class */ (function () {
                     case 3:
                         e_1 = _e.sent();
                         console.log(e_1);
-                        return [2 /*return*/, res.sendStatus(400)];
+                        return [2 /*return*/, res.status(400).json({ error: e_1.message })];
                     case 4: return [2 /*return*/];
                 }
             });
@@ -126,8 +126,7 @@ var GithubControlller = /** @class */ (function () {
                         return [3 /*break*/, 8];
                     case 7:
                         e_2 = _o.sent();
-                        console.log(e_2);
-                        return [2 /*return*/, res.sendStatus(400)];
+                        return [2 /*return*/, res.status(400).json({ error: e_2.message })];
                     case 8: return [2 /*return*/];
                 }
             });
@@ -176,7 +175,7 @@ var GithubControlller = /** @class */ (function () {
                     case 4:
                         e_3 = _d.sent();
                         console.log(e_3);
-                        return [2 /*return*/, res.sendStatus(400)];
+                        return [2 /*return*/, res.status(400).json({ error: e_3.message })];
                     case 5: return [2 /*return*/];
                 }
             });

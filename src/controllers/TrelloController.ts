@@ -57,7 +57,7 @@ class TrelloController {
       res.json(data.map((side: ProjectInterface) => side.id))
     } catch (e) {
       console.log(e)
-      return res.sendStatus(400)
+      return res.status(400).json({ error: e.message })
     }
   }
   async indexAllArticles(req: Request, res: Response) {
@@ -74,14 +74,14 @@ class TrelloController {
       res.json(articles)
     } catch (e) {
       console.log(e)
-      res.sendStatus(400)
+      return res.status(400).json({ error: e.message })
     }
   }
   async indexArticle(req: Request, res: Response) {
     try {
     } catch (e) {
       console.log(e)
-      res.sendStatus(400)
+      return res.status(400).json({ error: e.message })
     }
   }
   async listAllProjects(req: Request, res: Response) {
@@ -94,7 +94,7 @@ class TrelloController {
       res.json(data.map((side: ProjectInterface) => side.id))
     } catch (e) {
       console.log(e)
-      return res.sendStatus(400)
+      return res.status(400).json({ error: e.message })
     }
   }
   async indexAllProjects(req: Request, res: Response) {
@@ -109,14 +109,14 @@ class TrelloController {
       res.json(projects)
     } catch (e) {
       console.log(e)
-      return res.sendStatus(400)
+      return res.status(400).json({ error: e.message })
     }
   }
   async indexProject(req: Request, res: Response) {
     const { id } = req.params
     try {
     } catch (e) {
-      return res.sendStatus(400)
+      return res.status(400).json({ error: e.message })
     }
   }
   async listAllSides(req: Request, res: Response) {
@@ -130,7 +130,7 @@ class TrelloController {
       res.json(data.map((side: ProjectInterface) => side.id))
     } catch (e) {
       console.log(e)
-      return res.sendStatus(400)
+      return res.status(400).json({ error: e.message })
     }
   }
   async indexAllSides(req: Request, res: Response) {
@@ -146,7 +146,7 @@ class TrelloController {
       res.json(sides)
     } catch (e) {
       console.log(e)
-      return res.sendStatus(400)
+      return res.status(400).json({ error: e.message })
     }
   }
   async indexSide(req: Request, res: Response) {
@@ -203,7 +203,7 @@ class TrelloController {
       })
     } catch (e) {
       console.log(e)
-      return res.sendStatus(400)
+      return res.status(400).json({ error: e.message })
     }
   }
 }
