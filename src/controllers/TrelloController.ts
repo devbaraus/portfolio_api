@@ -1,6 +1,8 @@
 import { Request, Response } from 'express'
 import { trelloAPI } from '../services/api'
 
+const baseCloudinary = 'https://res.cloudinary.com/dmzu6cgre/image/upload/'
+
 interface ProjectInterface {
   id: string
   name: string
@@ -191,17 +193,24 @@ class TrelloController {
           return null
         }
 
-        let k = { w: 10000, url: '' }
+        if (attach.previews.length > 0) {
+          let k = { w: 10000, url: '' }
 
-        attach.previews.map((i: { width: number; url: string }) => {
-          if (i.width < k.w && i.width > 900) k = { w: i.width, url: i.url }
-          return i
-        })
+          attach.previews.map((i: { width: number; url: string }) => {
+            if (i.width < k.w && i.width > 300) k = { w: i.width, url: i.url }
+            return i
+          })
 
-        images.push({
-          name: attach.name,
-          url: k.url,
-        })
+          images.push({
+            name: attach.name,
+            url: k.url,
+          })
+        } else {
+          images.push({
+            name: attach.name,
+            url: baseCloudinary + attach.url.replace('http://', ''),
+          })
+        }
       })
 
       res.json({
