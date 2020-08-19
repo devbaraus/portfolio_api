@@ -17,18 +17,20 @@ app.use(morgan('tiny'))
 app.use(helmet())
 
 app
-  .get('/repos/', githubControlller.indexAll)
-  .get('/list/repos', githubControlller.listAll)
-  .get('/repos/:name', githubControlller.index)
-  .get('/articles/', devtoController.indexAllArticles)
-  // .get('/list/articles', mediumController.listAllArticles)
-  .get('/articles/:id', devtoController.indexArticle)
-  .get('/projects/', trelloController.indexAllProjects)
-  .get('/list/projects', trelloController.listAllProjects)
-  .get('/projects/:id', trelloController.indexProject)
+  .get('/repos/', githubControlller.indexAllRepos)
   .get('/sides/', trelloController.indexAllSides)
-  .get('/list/sides', trelloController.indexAllSides)
+  .get('/projects/', trelloController.indexAllProjects)
+  .get('/articles/', devtoController.indexAllArticles)
+
+  .get('/repos/:name', githubControlller.indexRepo)
   .get('/sides/:id', trelloController.indexSide)
+  .get('/projects/:id', trelloController.indexProject)
+  .get('/articles/:id', devtoController.indexArticle)
+
+  .get('/suggest/articles', devtoController.suggestArticles)
+  .get('/suggest/projects', trelloController.suggestProjects)
+  .get('/suggest/sides', trelloController.suggestSides)
+  .get('/suggest/repos', githubControlller.suggestRepos)
 
 app.listen(process.env.PORT || 3333, () => {
   console.log(`Server running at ${process.env.PORT || 3333}`)

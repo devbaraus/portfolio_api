@@ -1,5 +1,7 @@
 import { Request, Response } from 'express'
 import { devtoAPI } from '../services/api'
+// @ts-ignore
+import _ from 'lodash'
 
 devtoAPI.defaults.headers['api-key'] = process.env.DEVTO_TOKEN
 
@@ -74,18 +76,40 @@ export default class MediumController {
       return res.status(400).json({ error: e.message })
     }
   }
-  // async listAllArticles(req: Request, res: Response) {
-  //   const q = req.query
-  //   try {
-  //     const data = (await trelloAPI.get(`lists/${blogID}/cards`)).data.splice(
-  //       Number(q.page) * 10,
-  //       10,
-  //     )
-  //
-  //     res.json(data.map((side: ProjectInterface) => side.id))
-  //   } catch (e) {
-  //     console.log(e)
-  //     return res.status(400).json({ error: e.message })
-  //   }
-  // }
+  async suggestArticles(req: Request, res: Response) {
+    const { id, suggestions } = req.query
+    try {
+      const data = (await devtoAPI.get('articles/me/published')).data
+
+      const filter = data.filter((item: any) => Number(item.id) !== Number(id))
+
+      const shuffle = _.shuffle(filter).slice(0, suggestions || 2)
+
+      let articles = shuffle.map((article: any) => {
+        const {
+          title,
+          id,
+          description,
+          published_at,
+          cover_image,
+          tag_list,
+          url,
+        } = article
+        return {
+          id,
+          title,
+          description,
+          published_at,
+          cover: cover_image,
+          tags: tag_list,
+          url,
+        }
+      })
+
+      return res.json(articles)
+    } catch (e) {
+      console.log(e)
+      return res.status(400).json({ error: e.message })
+    }
+  }
 }

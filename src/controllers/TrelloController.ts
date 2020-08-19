@@ -1,5 +1,7 @@
 import { Request, Response } from 'express'
 import { trelloAPI } from '../services/api'
+// @ts-ignore
+import _ from 'lodash'
 
 const baseCloudinary = 'https://res.cloudinary.com/dmzu6cgre/image/upload/'
 
@@ -48,19 +50,6 @@ class TrelloController {
     return projects
   }
 
-  async listAllProjects(req: Request, res: Response) {
-    const q = req.query
-    try {
-      const data = (
-        await trelloAPI.get(`lists/${projectsID}/cards`)
-      ).data.splice(Number(q.page) * 10, 10)
-
-      res.json(data.map((side: ProjectInterface) => side.id))
-    } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
-    }
-  }
   async indexAllProjects(req: Request, res: Response) {
     const q = req.query
     try {
@@ -71,27 +60,6 @@ class TrelloController {
       const projects = await TrelloController.getList(data)
 
       res.json(projects)
-    } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
-    }
-  }
-  async indexProject(req: Request, res: Response) {
-    const { id } = req.params
-    try {
-    } catch (e) {
-      return res.status(400).json({ error: e.message })
-    }
-  }
-  async listAllSides(req: Request, res: Response) {
-    const q = req.query
-    try {
-      const data = (await trelloAPI.get(`lists/${sideID}/cards`)).data.splice(
-        Number(q.page) * 10,
-        10,
-      )
-
-      res.json(data.map((side: ProjectInterface) => side.id))
     } catch (e) {
       console.log(e)
       return res.status(400).json({ error: e.message })
@@ -110,6 +78,13 @@ class TrelloController {
       res.json(sides)
     } catch (e) {
       console.log(e)
+      return res.status(400).json({ error: e.message })
+    }
+  }
+  async indexProject(req: Request, res: Response) {
+    const { id } = req.params
+    try {
+    } catch (e) {
       return res.status(400).json({ error: e.message })
     }
   }
@@ -185,6 +160,44 @@ class TrelloController {
         contents,
         description: desc,
       })
+    } catch (e) {
+      console.log(e)
+      return res.status(400).json({ error: e.message })
+    }
+  }
+  async suggestProjects(req: Request, res: Response) {
+    const { id, suggestions } = req.query
+    try {
+      const data = (
+        await trelloAPI.get(`lists/${projectsID}/cards`)
+      ).data.splice()
+
+      const filter = data.filter((item: any) => item.id !== id)
+
+      const shuffle = _.shuffle(filter).slice(0, suggestions || 2)
+
+      const sides = await TrelloController.getList(shuffle)
+
+      res.json(sides)
+    } catch (e) {
+      console.log(e)
+      return res.status(400).json({ error: e.message })
+    }
+  }
+  async suggestSides(req: Request, res: Response) {
+    const { id, suggestions } = req.query
+    try {
+      const data = (await trelloAPI.get(`lists/${sideID}/cards`)).data
+
+      const filter = data.filter((item: any) => item.id !== id)
+
+      // console.log(data, filter)
+
+      const shuffle = _.shuffle(filter).slice(0, suggestions)
+
+      const sides = await TrelloController.getList(shuffle)
+
+      res.json(sides)
     } catch (e) {
       console.log(e)
       return res.status(400).json({ error: e.message })
