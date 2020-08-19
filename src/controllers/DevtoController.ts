@@ -77,13 +77,15 @@ export default class MediumController {
     }
   }
   async suggestArticles(req: Request, res: Response) {
-    const { id, suggestions } = req.query
+    const q = req.query
     try {
       const data = (await devtoAPI.get('articles/me/published')).data
 
-      const filter = data.filter((item: any) => Number(item.id) !== Number(id))
+      const filter = data.filter(
+        (item: any) => Number(item.id) !== Number(q.id),
+      )
 
-      const shuffle = _.shuffle(filter).slice(0, suggestions || 2)
+      const shuffle = _.shuffle(filter).slice(0, Number(q.suggestions) || 2)
 
       let articles = shuffle.map((article: any) => {
         const {

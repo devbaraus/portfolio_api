@@ -166,15 +166,15 @@ class TrelloController {
     }
   }
   async suggestProjects(req: Request, res: Response) {
-    const { id, suggestions } = req.query
+    const q = req.query
     try {
       const data = (
         await trelloAPI.get(`lists/${projectsID}/cards`)
       ).data.splice()
 
-      const filter = data.filter((item: any) => item.id !== id)
+      const filter = data.filter((item: any) => item.id !== q.id)
 
-      const shuffle = _.shuffle(filter).slice(0, suggestions || 2)
+      const shuffle = _.shuffle(filter).slice(0, Number(q.suggestions) || 2)
 
       const sides = await TrelloController.getList(shuffle)
 
@@ -185,15 +185,15 @@ class TrelloController {
     }
   }
   async suggestSides(req: Request, res: Response) {
-    const { id, suggestions } = req.query
+    const q = req.query
     try {
       const data = (await trelloAPI.get(`lists/${sideID}/cards`)).data
 
-      const filter = data.filter((item: any) => item.id !== id)
+      const filter = data.filter((item: any) => item.id !== q.id)
 
       // console.log(data, filter)
 
-      const shuffle = _.shuffle(filter).slice(0, suggestions)
+      const shuffle = _.shuffle(filter).slice(0, Number(q.suggestions) || 2)
 
       const sides = await TrelloController.getList(shuffle)
 

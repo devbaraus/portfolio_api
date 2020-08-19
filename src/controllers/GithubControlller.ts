@@ -17,7 +17,7 @@ interface RepositoryInterface {
 
 class GithubControlller {
   async suggestRepos(req: Request, res: Response) {
-    const { name, suggestions } = req.query
+    const q = req.query
     try {
       const data = (
         await gitAPI.get(`users/${GITHUB_USERNAME}/repos`, {
@@ -27,9 +27,9 @@ class GithubControlller {
         })
       ).data
 
-      const filter = data.filter((item: any) => item.name !== name)
+      const filter = data.filter((item: any) => item.name !== q.name)
 
-      const shuffle = _.shuffle(filter).slice(0, suggestions || 2)
+      const shuffle = _.shuffle(filter).slice(0, Number(q.suggestions) || 2)
 
       let repos: RepositoryInterface[] = []
 
