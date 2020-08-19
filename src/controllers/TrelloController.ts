@@ -11,8 +11,7 @@ interface ProjectInterface {
   cover: string
 }
 
-const [blogID, projectsID, sideID] = [
-  '5f36d228f32d450cbf3cbaf9',
+const [projectsID, sideID] = [
   '5f38107078c1558e6e2decc2',
   '5f38107732299f746fe544e7',
 ]
@@ -48,44 +47,7 @@ class TrelloController {
     }
     return projects
   }
-  async listAllArticles(req: Request, res: Response) {
-    const q = req.query
-    try {
-      const data = (await trelloAPI.get(`lists/${blogID}/cards`)).data.splice(
-        Number(q.page) * 10,
-        10,
-      )
 
-      res.json(data.map((side: ProjectInterface) => side.id))
-    } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
-    }
-  }
-  async indexAllArticles(req: Request, res: Response) {
-    const q = req.query
-
-    try {
-      const data = (await trelloAPI.get(`lists/${blogID}/cards`)).data.splice(
-        Number(q.page) * 10,
-        10,
-      )
-
-      const articles = await TrelloController.getList(data)
-
-      res.json(articles)
-    } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
-    }
-  }
-  async indexArticle(req: Request, res: Response) {
-    try {
-    } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
-    }
-  }
   async listAllProjects(req: Request, res: Response) {
     const q = req.query
     try {

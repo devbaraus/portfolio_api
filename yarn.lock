@@ -301,11 +301,6 @@ diff@^4.0.1:
   resolved "https://registry.yarnpkg.com/diff/-/diff-4.0.2.tgz#60f3aecb89d5fae520c11aa19efc2bb982aade7d"
   integrity sha512-58lmxKSA4BNyLz+HHMUzlOEpg09FV+ev6ZMe3vJihgdxzgcwZ8VoEEPmALCZG9LmqfVoNMMKpttIYTVG6uDY7A==
 
-dotenv@^8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
-  integrity sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==
-
 dynamic-dedupe@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/dynamic-dedupe/-/dynamic-dedupe-0.3.0.tgz#06e44c223f5e4e94d78ef9db23a6515ce2f962a1"
@@ -1090,11 +1085,6 @@ vary@^1, vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha1-IpnwLG3tMNSllhsLn3RSShj2NPw=
-
-webp-converter@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/webp-converter/-/webp-converter-2.3.0.tgz#940ce40f40c24e47fb9e4434dd13c1a629b89b16"
-  integrity sha512-FJJm9wYEV2sBhcqdQGgOowaCPdyf1yBAbgJVhI5m62f1lEyiAPgYxLHXmKQs/68DhL7dOyo59sr/LdW1UUBNBg==
 
 wrappy@1:
   version "1.0.2"

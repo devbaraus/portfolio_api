@@ -4,8 +4,10 @@ import cors from 'cors'
 import helmet from 'helmet'
 import GithubControlller from './controllers/GithubControlller'
 import TrellosController from './controllers/TrelloController'
+import DevtoController from './controllers/DevtoController'
 
 const githubControlller = new GithubControlller()
+const devtoController = new DevtoController()
 const trelloController = new TrellosController()
 
 const app = express()
@@ -18,9 +20,9 @@ app
   .get('/repos/', githubControlller.indexAll)
   .get('/list/repos', githubControlller.listAll)
   .get('/repos/:name', githubControlller.index)
-  .get('/articles/', trelloController.indexAllArticles)
-  .get('/list/articles', trelloController.listAllArticles)
-  .get('/articles/:id', trelloController.indexArticle)
+  .get('/articles/', devtoController.indexAllArticles)
+  // .get('/list/articles', mediumController.listAllArticles)
+  .get('/articles/:id', devtoController.indexArticle)
   .get('/projects/', trelloController.indexAllProjects)
   .get('/list/projects', trelloController.listAllProjects)
   .get('/projects/:id', trelloController.indexProject)

@@ -18,3 +18,7 @@ export const gitAPI = axios.create({
     password: process.env.GITHUB_TOKEN,
   } as AxiosBasicCredentials,
 })
+
+export const devtoAPI = axios.create({
+  baseURL: 'https://dev.to/api/',
+})
