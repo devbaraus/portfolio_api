@@ -23,7 +23,7 @@ class TrelloController {
     let projects: ProjectInterface[] = []
 
     for (let index in arr) {
-      let { id, name, shortUrl, labels, cover } = arr[index]
+      let { id, name, shortUrl, labels } = arr[index]
 
       labels = labels.map((label: { name: string }) => label.name)
 
@@ -55,7 +55,7 @@ class TrelloController {
     try {
       const data = (
         await trelloAPI.get(`lists/${projectsID}/cards`)
-      ).data.splice(Number(q.page) * 10, 10)
+      ).data.splice(Number(q.page || 0) * 10, 10)
 
       const projects = await TrelloController.getList(data)
 

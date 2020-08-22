@@ -9,7 +9,8 @@ const { GITHUB_USERNAME } = process.env
 interface RepositoryInterface {
   name: string
   description: string
-  html_url: string
+  stargazers: number
+  url: string
   clone_url: string
   languages?: []
   read_me?: string
@@ -22,7 +23,9 @@ class GithubControlller {
       const data = (
         await gitAPI.get(`users/${GITHUB_USERNAME}/repos`, {
           params: {
-            sort: 'updated',
+            sort: q.sort || 'updated',
+            page: q.page || 1,
+            per_page: q.per_page || 6,
           },
         })
       ).data
@@ -38,7 +41,7 @@ class GithubControlller {
         repos.push({
           name,
           description,
-          html_url,
+          url: html_url,
           clone_url,
           languages: Object.keys(
             (await gitAPI.get(`repos/${GITHUB_USERNAME}/${name}/languages`))
@@ -54,14 +57,14 @@ class GithubControlller {
     }
   }
   async indexAllRepos(req: Request, res: Response) {
-    const { per_page = 10, page = 1, sort = 'updated' } = req.query
+    const q = req.query
     try {
       const data = (
         await gitAPI.get(`users/${GITHUB_USERNAME}/repos`, {
           params: {
-            per_page,
-            sort,
-            page,
+            sort: q.sort || 'updated',
+            page: q.page || 1,
+            per_page: q.per_page || 6,
           },
         })
       ).data
@@ -73,7 +76,7 @@ class GithubControlller {
         repos.push({
           name,
           description,
-          html_url,
+          url: html_url,
           clone_url,
           languages: Object.keys(
             (await gitAPI.get(`repos/${GITHUB_USERNAME}/${name}/languages`))
@@ -90,7 +93,7 @@ class GithubControlller {
     const { name } = req.params
 
     try {
-      const { html_url, description, clone_url } = (
+      const { html_url, description, clone_url, stargazers_count } = (
         await gitAPI.get(`repos/${GITHUB_USERNAME}/${name}`)
       ).data
 
@@ -105,21 +108,12 @@ class GithubControlller {
         .then((response) => {
           return res.json({
             name,
-            html_url,
+            url: html_url,
+            stargazers: stargazers_count,
             description,
             clone_url,
             languages,
             read_me: response.data,
-          } as RepositoryInterface)
-        })
-        .catch((e) => {
-          return res.json({
-            name,
-            html_url,
-            description,
-            clone_url,
-            languages,
-            read_me: '',
           } as RepositoryInterface)
         })
     } catch (e) {
