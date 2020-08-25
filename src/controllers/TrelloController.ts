@@ -27,15 +27,13 @@ class TrelloController {
 
       labels = labels.map((label: { name: string }) => label.name)
 
-      let k = { w: 10000, url: '' }
+      let cover = ''
       let attachments = (await trelloAPI.get(`cards/${id}/attachments/`)).data
 
-      attachments.map((attach: { previews: []; name: string }) => {
-        if (attach.name === 'cover')
-          return attach.previews.map((i: { width: number; url: string }) => {
-            if (i.width < k.w && i.width > 300) k = { w: i.width, url: i.url }
-            return i
-          })
+      attachments.map((attach: { url: ''; name: string }) => {
+        if (attach.name === 'cover') {
+          cover = attach.url
+        }
         return
       })
 
@@ -44,7 +42,7 @@ class TrelloController {
         name,
         url: shortUrl,
         labels,
-        cover: k.url,
+        cover,
       })
     }
     return projects
@@ -92,10 +90,12 @@ class TrelloController {
 
       let k = { w: 10000, url: '' }
 
-      cover.scaled.map((i: { width: number; url: string }) => {
-        if (i.width < k.w && i.width > 900) k = { w: i.width, url: i.url }
-        return i
-      })
+      if (cover.idAttachment) {
+        cover.scaled.map((i: { width: number; url: string }) => {
+          if (i.width < k.w && i.width > 900) k = { w: i.width, url: i.url }
+          return i
+        })
+      }
 
       let attachments = (await trelloAPI.get(`cards/${id}/attachments`)).data
 
@@ -119,7 +119,12 @@ class TrelloController {
           return null
         }
 
-        if (['logo', 'cover'].includes(attach.name)) {
+        if (['logo'].includes(attach.name)) {
+          return null
+        }
+
+        if (attach.name === 'cover') {
+          k.url = attach.url
           return null
         }
 
@@ -138,7 +143,7 @@ class TrelloController {
         } else {
           images.push({
             name: attach.name,
-            url: baseCloudinary + attach.url.replace('http://', ''),
+            url: attach.url,
           })
         }
       })
@@ -215,7 +220,7 @@ class TrelloController {
         } else {
           images.push({
             name: attach.name,
-            url: baseCloudinary + attach.url.replace('http://', ''),
+            url: attach.url,
           })
         }
       })
