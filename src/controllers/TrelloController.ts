@@ -28,6 +28,7 @@ class TrelloController {
       labels = labels.map((label: { name: string }) => label.name)
 
       let cover = ''
+
       let attachments = (await trelloAPI.get(`cards/${id}/attachments/`)).data
 
       attachments.map((attach: { url: ''; name: string }) => {
@@ -82,22 +83,14 @@ class TrelloController {
   async indexProject(req: Request, res: Response) {
     const { id } = req.params
     try {
-      let { name, labels, cover, desc } = await (
-        await trelloAPI.get(`cards/${id}`)
-      ).data
+      let { name, labels, desc } = await (await trelloAPI.get(`cards/${id}`))
+        .data
 
       labels = labels.map((label: { name: string }) => label.name)
 
-      let k = { w: 10000, url: '' }
-
-      if (cover.idAttachment) {
-        cover.scaled.map((i: { width: number; url: string }) => {
-          if (i.width < k.w && i.width > 900) k = { w: i.width, url: i.url }
-          return i
-        })
-      }
-
       let attachments = (await trelloAPI.get(`cards/${id}/attachments`)).data
+
+      let cover = ''
 
       let url = ''
 
@@ -108,7 +101,7 @@ class TrelloController {
       attachments.map((attach: { previews: []; name: string; url: string }) => {
         if (attach.name === 'url') {
           url = attach.url
-          return null
+          return
         }
 
         if (attach.name.startsWith('content:')) {
@@ -116,42 +109,30 @@ class TrelloController {
             name: attach.name.replace('content:', ''),
             url: attach.url,
           })
-          return null
+          return
         }
 
         if (['logo'].includes(attach.name)) {
-          return null
+          return
         }
 
         if (attach.name === 'cover') {
-          k.url = attach.url
-          return null
+          cover = attach.url
+          return
         }
 
-        if (attach.previews.length > 0) {
-          let k = { w: 10000, url: '' }
+        images.push({
+          name: attach.name,
+          url: attach.url,
+        })
 
-          attach.previews.map((i: { width: number; url: string }) => {
-            if (i.width < k.w && i.width > 300) k = { w: i.width, url: i.url }
-            return i
-          })
-
-          images.push({
-            name: attach.name,
-            url: k.url,
-          })
-        } else {
-          images.push({
-            name: attach.name,
-            url: attach.url,
-          })
-        }
+        return
       })
 
       res.json({
         id,
         name,
-        cover: k.url,
+        cover,
         labels,
         images,
         url,
@@ -166,28 +147,31 @@ class TrelloController {
   async indexSide(req: Request, res: Response) {
     const { id } = req.params
     try {
-      let { name, labels, cover, desc } = await (
-        await trelloAPI.get(`cards/${id}`)
-      ).data
+      let { name, labels, desc } = await (await trelloAPI.get(`cards/${id}`))
+        .data
 
       labels = labels.map((label: { name: string }) => label.name)
-
-      let k = { w: 10000, url: '' }
-
-      cover.scaled.map((i: { width: number; url: string }) => {
-        if (i.width < k.w && i.width > 900) k = { w: i.width, url: i.url }
-        return i
-      })
 
       let attachments = (await trelloAPI.get(`cards/${id}/attachments`)).data
 
       let url = ''
+
+      let logo = ''
 
       let images: Array<any> = []
 
       let contents: Array<any> = []
 
       attachments.map((attach: { previews: []; name: string; url: string }) => {
+        if (attach.name === 'cover') {
+          return
+        }
+
+        if (attach.name === 'logo') {
+          logo = attach.url
+          return
+        }
+
         if (attach.name === 'url') {
           url = attach.url
           return null
@@ -198,37 +182,20 @@ class TrelloController {
             name: attach.name.replace('content:', ''),
             url: attach.url,
           })
-          return null
+          return
         }
 
-        if (['logo', 'cover'].includes(attach.name)) {
-          return null
-        }
-
-        if (attach.previews.length > 0) {
-          let k = { w: 10000, url: '' }
-
-          attach.previews.map((i: { width: number; url: string }) => {
-            if (i.width < k.w && i.width > 300) k = { w: i.width, url: i.url }
-            return i
-          })
-
-          images.push({
-            name: attach.name,
-            url: k.url,
-          })
-        } else {
-          images.push({
-            name: attach.name,
-            url: attach.url,
-          })
-        }
+        images.push({
+          name: attach.name,
+          url: attach.url,
+        })
+        return null
       })
 
       res.json({
         id,
         name,
-        cover: k.url,
+        logo,
         labels,
         images,
         url,
