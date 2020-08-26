@@ -7,16 +7,14 @@ devtoAPI.defaults.headers['api-key'] = process.env.DEVTO_TOKEN
 
 export default class MediumController {
   async indexAllArticles(req: Request, res: Response) {
-    const { page, per_page } = req.query
+    const q = req.query
     try {
-      const data = (
-        await devtoAPI.get('articles/me/published', {
-          params: {
-            page,
-            per_page,
-          },
-        })
-      ).data
+      let data = (await devtoAPI.get('articles/me/published')).data
+
+      const total = data.length
+
+      data = data.splice(Number(q.page), Number(q.per_page) || 6)
+
       let articles = data.map((article: any) => {
         const {
           title,
@@ -38,12 +36,13 @@ export default class MediumController {
         }
       })
 
-      return res.json(articles)
+      return res.json({ total, articles })
     } catch (e) {
       console.log(e)
       return res.status(400).json({ error: e.message })
     }
   }
+
   async indexArticle(req: Request, res: Response) {
     const { id } = req.params
     try {
@@ -76,6 +75,7 @@ export default class MediumController {
       return res.status(400).json({ error: e.message })
     }
   }
+
   async suggestArticles(req: Request, res: Response) {
     const q = req.query
     try {

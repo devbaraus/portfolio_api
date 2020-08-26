@@ -1,4 +1,4 @@
-import { Response, Request, response } from 'express'
+import { Request, Response } from 'express'
 import { gitAPI } from '../services/api'
 import axios from 'axios'
 // @ts-ignore
@@ -13,6 +13,7 @@ interface RepositoryInterface {
   url: string
   clone_url: string
   languages?: []
+  size?: number
   read_me?: string
 }
 
@@ -56,18 +57,21 @@ class GithubControlller {
       return res.status(400).json({ error: e.message })
     }
   }
+
   async indexAllRepos(req: Request, res: Response) {
     const q = req.query
     try {
-      const data = (
+      let data = (
         await gitAPI.get(`users/${GITHUB_USERNAME}/repos`, {
           params: {
             sort: q.sort || 'updated',
-            page: q.page || 1,
-            per_page: q.per_page || 6,
           },
         })
       ).data
+
+      const total = data.length
+
+      data = data.splice(Number(q.page), Number(q.per_page) || 6)
 
       let repos: RepositoryInterface[] = []
 
@@ -84,16 +88,17 @@ class GithubControlller {
           ),
         } as RepositoryInterface)
       }
-      res.json(repos)
+      res.json({ total, repos })
     } catch (e) {
       return res.status(400).json({ error: e.message })
     }
   }
+
   async indexRepo(req: Request, res: Response) {
     const { name } = req.params
 
     try {
-      const { html_url, description, clone_url, stargazers_count } = (
+      const { html_url, description, clone_url, stargazers_count, size } = (
         await gitAPI.get(`repos/${GITHUB_USERNAME}/${name}`)
       ).data
 
@@ -113,6 +118,7 @@ class GithubControlller {
             description,
             clone_url,
             languages,
+            size,
             read_me: response.data,
           } as RepositoryInterface)
         })

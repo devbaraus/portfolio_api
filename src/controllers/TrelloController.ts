@@ -52,34 +52,39 @@ class TrelloController {
   async indexAllProjects(req: Request, res: Response) {
     const q = req.query
     try {
-      const data = (
-        await trelloAPI.get(`lists/${projectsID}/cards`)
-      ).data.splice(Number(q.page || 0) * 10, 10)
+      let data = (await trelloAPI.get(`lists/${projectsID}/cards`)).data
+
+      const total = data.length
+
+      data = data.splice(Number(q.page), Number(q.per_page) || 6)
 
       const projects = await TrelloController.getList(data)
 
-      res.json(projects)
+      res.json({ total, projects })
     } catch (e) {
       console.log(e)
       return res.status(400).json({ error: e.message })
     }
   }
+
   async indexAllSides(req: Request, res: Response) {
     const q = req.query
     try {
-      const data = (await trelloAPI.get(`lists/${sideID}/cards`)).data.splice(
-        Number(q.page) * 10,
-        10,
-      )
+      let data = (await trelloAPI.get(`lists/${sideID}/cards`)).data
+
+      const total = data.length
+
+      data = data.splice(Number(q.page), Number(q.per_page) || 6)
 
       const sides = await TrelloController.getList(data)
 
-      res.json(sides)
+      res.json({ total, sides })
     } catch (e) {
       console.log(e)
       return res.status(400).json({ error: e.message })
     }
   }
+
   async indexProject(req: Request, res: Response) {
     const { id } = req.params
     try {
@@ -144,6 +149,7 @@ class TrelloController {
       return res.status(400).json({ error: e.message })
     }
   }
+
   async indexSide(req: Request, res: Response) {
     const { id } = req.params
     try {
@@ -207,6 +213,7 @@ class TrelloController {
       return res.status(400).json({ error: e.message })
     }
   }
+
   async suggestProjects(req: Request, res: Response) {
     const q = req.query
     try {
@@ -224,6 +231,7 @@ class TrelloController {
       return res.status(400).json({ error: e.message })
     }
   }
+
   async suggestSides(req: Request, res: Response) {
     const q = req.query
     try {
