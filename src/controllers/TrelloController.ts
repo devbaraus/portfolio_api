@@ -52,7 +52,9 @@ class TrelloController {
   async indexAllProjects(req: Request, res: Response) {
     const q = req.query
     try {
-      let data = (await trelloAPI.get(`lists/${projectsID}/cards`)).data
+      let data = await (await trelloAPI.get(`lists/${projectsID}/cards`)).data
+
+      console.log('data')
 
       const total = data.length
 
@@ -70,7 +72,7 @@ class TrelloController {
   async indexAllSides(req: Request, res: Response) {
     const q = req.query
     try {
-      let data = (await trelloAPI.get(`lists/${sideID}/cards`)).data
+      let data = await (await trelloAPI.get(`lists/${sideID}/cards`)).data
 
       const total = data.length
 

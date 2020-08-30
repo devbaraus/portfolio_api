@@ -16,6 +16,8 @@ app.use(cors())
 app.use(morgan('tiny'))
 app.use(helmet())
 
+// TrellosController.getBoardList().then((r) => {})
+
 app
   .get('/repos/', githubControlller.indexAllRepos)
   .get('/sides/', trelloController.indexAllSides)
