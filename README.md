@@ -53,8 +53,6 @@ All repositories are get from GitHub API and all post from Dev API, following th
 
 All secret data are in ambient variables so I don't need to worry.
 
-![Trello Card](https://res.cloudinary.com/dmzu6cgre/image/upload/v1598060458/portfolio/public/trello.com-portfolioTrello_zy1orl.png)
-
 # Free
 
 I build this API because I saw on a website a guy using Trello as a CMS so build it too :smile:
