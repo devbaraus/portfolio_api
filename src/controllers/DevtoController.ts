@@ -2,18 +2,66 @@ import { Request, Response } from 'express'
 import { devtoAPI } from '../services/api'
 // @ts-ignore
 import _ from 'lodash'
+import Singleton from '../database/TempDatabase'
+import StorageController from './StorageController'
 
 devtoAPI.defaults.headers['api-key'] = process.env.DEVTO_TOKEN
 
-export default class MediumController {
+export interface ArticleInterface {
+  title: string
+  description: string
+  published_at: string
+  tags: Array<any>
+  url: string
+  edited_at: string
+  id: string
+  reactions: number
+  cover: string
+  content: string
+}
+
+export default class DevtoController {
+  static async init() {
+    if (new Singleton().getInstance().articles.length == 0) {
+      console.log('----- SEARCHING ARTICLES -----')
+      await StorageController.storeArticles()
+      console.log('----- FINISHED ARTICLES -----')
+    }
+
+    return new DevtoController()
+  }
+
+  static async getOneArticle(id: string): Promise<ArticleInterface> {
+    const {
+      title,
+      description,
+      published_at,
+      cover_image,
+      tags,
+      url,
+      public_reactions_count,
+      edited_at,
+      body_markdown,
+    } = (await devtoAPI.get(`articles/${id}`)).data
+
+    return {
+      id,
+      title,
+      description,
+      published_at,
+      reactions: public_reactions_count,
+      cover: cover_image,
+      tags,
+      url,
+      edited_at,
+      content: body_markdown,
+    } as ArticleInterface
+  }
+
   async indexAllArticles(req: Request, res: Response) {
     const q = req.query
     try {
       let data = (await devtoAPI.get('articles/me/published')).data
-
-      const total = data.length
-
-      data = data.splice(Number(q.page), Number(q.per_page) || 6)
 
       let articles = data.map((article: any) => {
         const {
@@ -36,7 +84,7 @@ export default class MediumController {
         }
       })
 
-      return res.json({ total, articles })
+      return res.json(articles)
     } catch (e) {
       console.log(e)
       return res.status(400).json({ error: e.message })
@@ -46,30 +94,7 @@ export default class MediumController {
   async indexArticle(req: Request, res: Response) {
     const { id } = req.params
     try {
-      const {
-        title,
-        description,
-        published_at,
-        cover_image,
-        tags,
-        url,
-        public_reactions_count,
-        edited_at,
-        body_markdown,
-      } = (await devtoAPI.get(`articles/${id}`)).data
-
-      res.json({
-        id,
-        title,
-        description,
-        published_at,
-        reactions: public_reactions_count,
-        cover: cover_image,
-        tags,
-        url,
-        edited_at,
-        content: body_markdown,
-      })
+      res.json(await DevtoController.getOneArticle(id))
     } catch (e) {
       console.log(e)
       return res.status(400).json({ error: e.message })

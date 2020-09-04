@@ -2,15 +2,20 @@ import { Request, Response } from 'express'
 import { trelloAPI } from '../services/api'
 // @ts-ignore
 import _ from 'lodash'
+import GithubControlller from './GithubControlller'
+import Singleton from '../database/TempDatabase'
+import StorageController from './StorageController'
 
-const baseCloudinary = 'https://res.cloudinary.com/dmzu6cgre/image/upload/'
-
-interface ProjectInterface {
+export interface ProjectInterface {
   id: string
   name: string
   url: string
   labels: string
   cover: string
+  logo: string
+  images?: Array<any>
+  contents?: Array<any>
+  description: string
 }
 
 const [projectsID, sideID] = [
@@ -19,50 +24,86 @@ const [projectsID, sideID] = [
 ]
 
 class TrelloController {
-  static async getList(arr: Array<any>) {
-    let projects: ProjectInterface[] = []
-
-    for (let index in arr) {
-      let { id, name, shortUrl, labels } = arr[index]
-
-      labels = labels.map((label: { name: string }) => label.name)
-
-      let cover = ''
-
-      let attachments = (await trelloAPI.get(`cards/${id}/attachments/`)).data
-
-      attachments.map((attach: { url: ''; name: string }) => {
-        if (attach.name === 'cover') {
-          cover = attach.url
-        }
-        return
-      })
-
-      projects.push({
-        id,
-        name,
-        url: shortUrl,
-        labels,
-        cover,
-      })
+  static async init() {
+    if (
+      new Singleton().getInstance().projects.length == 0 ||
+      new Singleton().getInstance().sides.length == 0
+    ) {
+      console.log('----- SEARCHING PROJECTS -----')
+      await StorageController.storeProjects()
+      console.log('----- FINISHED PROJECTS -----')
+      console.log('----- SEARCHING SIDES -----')
+      await StorageController.storeSides()
+      console.log('----- FINISHED SIDES -----')
     }
-    return projects
+
+    return new TrelloController()
+  }
+
+  static async getOneProject(id: string): Promise<ProjectInterface> {
+    let { name, labels, desc } = await (await trelloAPI.get(`cards/${id}`)).data
+
+    labels = labels.map((label: { name: string }) => label.name)
+
+    let attachments = (await trelloAPI.get(`cards/${id}/attachments`)).data
+
+    let cover = ''
+
+    let url = ''
+
+    let logo = ''
+
+    let images: Array<any> = []
+
+    let contents: Array<any> = []
+
+    attachments.map((attach: { previews: []; name: string; url: string }) => {
+      if (attach.name === 'url') {
+        url = attach.url
+        return
+      }
+
+      if (attach.name.startsWith('content:')) {
+        contents.push({
+          name: attach.name.replace('content:', ''),
+          url: attach.url,
+        })
+        return
+      }
+      if (attach.name === 'logo') {
+        logo = attach.url
+        return
+      }
+
+      if (attach.name === 'cover') {
+        cover = attach.url
+        return
+      }
+
+      images.push({
+        name: attach.name,
+        url: attach.url,
+      })
+
+      return
+    })
+
+    return {
+      id,
+      name,
+      cover,
+      labels,
+      logo,
+      images,
+      url,
+      contents,
+      description: desc,
+    }
   }
 
   async indexAllProjects(req: Request, res: Response) {
-    const q = req.query
     try {
-      let data = await (await trelloAPI.get(`lists/${projectsID}/cards`)).data
-
-      console.log('data')
-
-      const total = data.length
-
-      data = data.splice(Number(q.page), Number(q.per_page) || 6)
-
-      const projects = await TrelloController.getList(data)
-
-      res.json({ total, projects })
+      res.json(new Singleton().getInstance().getAllProjects())
     } catch (e) {
       console.log(e)
       return res.status(400).json({ error: e.message })
@@ -70,17 +111,8 @@ class TrelloController {
   }
 
   async indexAllSides(req: Request, res: Response) {
-    const q = req.query
     try {
-      let data = await (await trelloAPI.get(`lists/${sideID}/cards`)).data
-
-      const total = data.length
-
-      data = data.splice(Number(q.page), Number(q.per_page) || 6)
-
-      const sides = await TrelloController.getList(data)
-
-      res.json({ total, sides })
+      res.json(new Singleton().getInstance().getAllSides())
     } catch (e) {
       console.log(e)
       return res.status(400).json({ error: e.message })
@@ -90,62 +122,7 @@ class TrelloController {
   async indexProject(req: Request, res: Response) {
     const { id } = req.params
     try {
-      let { name, labels, desc } = await (await trelloAPI.get(`cards/${id}`))
-        .data
-
-      labels = labels.map((label: { name: string }) => label.name)
-
-      let attachments = (await trelloAPI.get(`cards/${id}/attachments`)).data
-
-      let cover = ''
-
-      let url = ''
-
-      let images: Array<any> = []
-
-      let contents: Array<any> = []
-
-      attachments.map((attach: { previews: []; name: string; url: string }) => {
-        if (attach.name === 'url') {
-          url = attach.url
-          return
-        }
-
-        if (attach.name.startsWith('content:')) {
-          contents.push({
-            name: attach.name.replace('content:', ''),
-            url: attach.url,
-          })
-          return
-        }
-
-        if (['logo'].includes(attach.name)) {
-          return
-        }
-
-        if (attach.name === 'cover') {
-          cover = attach.url
-          return
-        }
-
-        images.push({
-          name: attach.name,
-          url: attach.url,
-        })
-
-        return
-      })
-
-      res.json({
-        id,
-        name,
-        cover,
-        labels,
-        images,
-        url,
-        contents,
-        description: desc,
-      })
+      res.json(new Singleton().getInstance().getProject(id))
     } catch (e) {
       console.log(e)
       return res.status(400).json({ error: e.message })
@@ -155,61 +132,7 @@ class TrelloController {
   async indexSide(req: Request, res: Response) {
     const { id } = req.params
     try {
-      let { name, labels, desc } = await (await trelloAPI.get(`cards/${id}`))
-        .data
-
-      labels = labels.map((label: { name: string }) => label.name)
-
-      let attachments = (await trelloAPI.get(`cards/${id}/attachments`)).data
-
-      let url = ''
-
-      let logo = ''
-
-      let images: Array<any> = []
-
-      let contents: Array<any> = []
-
-      attachments.map((attach: { previews: []; name: string; url: string }) => {
-        if (attach.name === 'cover') {
-          return
-        }
-
-        if (attach.name === 'logo') {
-          logo = attach.url
-          return
-        }
-
-        if (attach.name === 'url') {
-          url = attach.url
-          return null
-        }
-
-        if (attach.name.startsWith('content:')) {
-          contents.push({
-            name: attach.name.replace('content:', ''),
-            url: attach.url,
-          })
-          return
-        }
-
-        images.push({
-          name: attach.name,
-          url: attach.url,
-        })
-        return null
-      })
-
-      res.json({
-        id,
-        name,
-        logo,
-        labels,
-        images,
-        url,
-        contents,
-        description: desc,
-      })
+      res.json(new Singleton().getInstance().getSide(id))
     } catch (e) {
       console.log(e)
       return res.status(400).json({ error: e.message })
@@ -219,15 +142,13 @@ class TrelloController {
   async suggestProjects(req: Request, res: Response) {
     const q = req.query
     try {
-      const data = (await trelloAPI.get(`lists/${projectsID}/cards`)).data
+      const data = new Singleton().getInstance().getAllProjects()
 
       const filter = data.filter((item: any) => item.id !== q.id)
 
       const shuffle = _.shuffle(filter).slice(0, Number(q.suggestions) || 2)
 
-      const sides = await TrelloController.getList(shuffle)
-
-      res.json(sides)
+      res.json(shuffle)
     } catch (e) {
       console.log(e)
       return res.status(400).json({ error: e.message })
@@ -237,17 +158,13 @@ class TrelloController {
   async suggestSides(req: Request, res: Response) {
     const q = req.query
     try {
-      const data = (await trelloAPI.get(`lists/${sideID}/cards`)).data
+      const data = new Singleton().getInstance().getAllSides()
 
       const filter = data.filter((item: any) => item.id !== q.id)
 
-      // console.log(data, filter)
-
       const shuffle = _.shuffle(filter).slice(0, Number(q.suggestions) || 2)
 
-      const sides = await TrelloController.getList(shuffle)
-
-      res.json(sides)
+      res.json(shuffle)
     } catch (e) {
       console.log(e)
       return res.status(400).json({ error: e.message })
