@@ -72,7 +72,7 @@ class GithubControlller {
     try {
       const data = new Singleton().getInstance().getAllRepos()
 
-      const filter = data.filter((item: any) => item.name !== q.name)
+      const filter = data.filter((item: any) => item.name != q.name)
 
       const shuffle = _.shuffle(filter).slice(
         0,
