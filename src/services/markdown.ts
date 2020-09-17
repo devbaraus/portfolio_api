@@ -1,5 +1,5 @@
 import showdown from 'showdown'
-import cheerio from 'cheerio'
+import textversionjs from 'textversionjs'
 
 function markdown() {
   return new showdown.Converter()
@@ -7,6 +7,5 @@ function markdown() {
 
 export function getTextFromMarkdown(input: string) {
   const html = markdown().makeHtml(input)
-  const $ = cheerio.load(html)
-  return $.text()
+  return textversionjs(html)
 }
