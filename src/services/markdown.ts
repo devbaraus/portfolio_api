@@ -1,28 +1,9 @@
 import showdown from 'showdown'
-import textversionjs from 'textversionjs'
+import { JSDOM } from 'jsdom'
 
-// const showdown = require('showdown')
-// const textversionjs = require('textversionjs')
+const markdown = new showdown.Converter()
 
-function markdown() {
-  return new showdown.Converter({
-    omitExtraWLInCodeBlocks: true,
-    ghCompatibleHeaderId: true,
-    simplifiedAutoLink: true,
-    strikethrough: true,
-    tables: true,
-    ghCodeBlocks: true,
-    smartIndentationFix: true,
-    simpleLineBreaks: true,
-    ghMentions: true,
-    encodeEmails: true,
-    openLinksInNewWindow: true,
-    emoji: true,
-    literalMidWordUnderscores: true,
-  })
-}
-
-export function getTextFromMarkdown(input: string) {
-  const html = markdown().makeHtml(input)
-  return textversionjs(html)
+export function getTextFromMarkdown(str: any): string | null{
+  const html = markdown.makeHtml(str)
+  return JSDOM.fragment(html).textContent
 }
