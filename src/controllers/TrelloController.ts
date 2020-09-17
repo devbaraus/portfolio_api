@@ -5,6 +5,7 @@ import _ from 'lodash'
 import GithubControlller from './GithubControlller'
 import Singleton from '../database/TempDatabase'
 import StorageController from './StorageController'
+import { getTextFromMarkdown } from '../services/markdown'
 
 export interface ProjectInterface {
   id: string
@@ -15,6 +16,7 @@ export interface ProjectInterface {
   logo: string
   images?: Array<any>
   contents?: Array<any>
+  content: string
   description: string
 }
 
@@ -36,7 +38,6 @@ class TrelloController {
       await StorageController.storeSides()
       console.log('----- FINISHED SIDES -----')
     }
-
     return new TrelloController()
   }
 
@@ -56,6 +57,8 @@ class TrelloController {
     let images: Array<any> = []
 
     let contents: Array<any> = []
+
+    let description = _.truncate(getTextFromMarkdown(desc), { length: 120 })
 
     attachments.map((attach: { previews: []; name: string; url: string }) => {
       if (attach.name === 'url') {
@@ -97,7 +100,8 @@ class TrelloController {
       images,
       url,
       contents,
-      description: desc,
+      content: desc,
+      description,
     }
   }
 
