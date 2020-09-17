@@ -4,8 +4,7 @@ import textversionjs from 'textversionjs'
 // const showdown = require('showdown')
 // const textversionjs = require('textversionjs')
 
-function markdown() {
-  return new showdown.Converter({
+const markdown = new showdown.Converter({
     omitExtraWLInCodeBlocks: true,
     ghCompatibleHeaderId: true,
     simplifiedAutoLink: true,
@@ -20,9 +19,9 @@ function markdown() {
     emoji: true,
     literalMidWordUnderscores: true,
   })
-}
+
 
 export function getTextFromMarkdown(input: string) {
-  const html = markdown().makeHtml(input)
+  const html = markdown.makeHtml(input)
   return textversionjs(html)
 }
