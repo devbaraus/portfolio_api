@@ -58,7 +58,7 @@ class TrelloController {
 
     let contents: Array<any> = []
 
-    let description = _.truncate(getTextFromMarkdown('') || '', { length: 120 })
+    let description = _.truncate(getTextFromMarkdown(desc), { length: 120 })
 
     attachments.map((attach: { previews: []; name: string; url: string }) => {
       if (attach.name === 'url') {
