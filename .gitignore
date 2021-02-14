@@ -118,4 +118,6 @@ out
 
 dist
 
+/.idea/
+
 src/screenshots/**

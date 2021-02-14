@@ -60,7 +60,7 @@ class TempDatabase {
 
   getAllRepos() {
     return this.repos.map((item) => {
-      let { name, description, url, clone_url, languages, topics } = item
+      let { name, description, url, clone_url, languages, topics, updated_at } = item
       return {
         name,
         description,
@@ -68,6 +68,7 @@ class TempDatabase {
         clone_url,
         languages,
         topics,
+        updated_at
       }
     })
   }

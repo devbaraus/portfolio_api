@@ -18,6 +18,7 @@ export interface RepositoryInterface {
   topics?: []
   size?: number
   read_me?: string
+  updated_at: string
 }
 
 class GithubControlller {
@@ -32,7 +33,7 @@ class GithubControlller {
   }
 
   static async getOneRepo(name: string) {
-    const { html_url, description, clone_url, stargazers_count, size } = (
+    const { html_url, description, clone_url, stargazers_count, size, updated_at } = (
       await gitAPI.get(`repos/${GITHUB_USERNAME}/${name}`)
     ).data
 
@@ -64,6 +65,7 @@ class GithubControlller {
       topics,
       size,
       read_me,
+      updated_at,
     } as RepositoryInterface
   }
 
@@ -89,7 +91,19 @@ class GithubControlller {
   async indexAllRepos(req: Request, res: Response) {
     try {
       const repos = new Singleton().getInstance().getAllRepos()
-      res.json(repos)
+
+      // @ts-ignore
+      const sortedRepos = repos.sort((a: RepositoryInterface, b: RepositoryInterface) => {
+        if (a['updated_at'] > b['updated_at']) {
+          return -1
+        }
+        if (a['updated_at'] < b['updated_at']) {
+          return 1
+        }
+        return 0
+      })
+
+      res.json(sortedRepos)
     } catch (e) {
       return res.status(400).json({ error: e.message })
     }
