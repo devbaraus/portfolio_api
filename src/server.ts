@@ -6,6 +6,8 @@ import DevtoController, { pingParamsDevto, pingQueryDevto } from './controllers/
 import TrelloController, { pingParamsTrello, pingQueryTrello } from './controllers/TrelloController'
 
 (async () => {
+  console.log(process.env.PORT || 3333);
+
   const githubControlller = await GithubControlller.init()
   const devtoController = await DevtoController.init()
   const trelloController = await TrelloController.init()
