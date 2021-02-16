@@ -1,24 +1,10 @@
-import { Request, Response } from 'express'
+import { FastifyReply, FastifyRequest } from 'fastify'
 import { trelloAPI } from '../services/api'
 // @ts-ignore
 import _ from 'lodash'
-import GithubControlller from './GithubControlller'
 import Singleton from '../database/TempDatabase'
 import StorageController from './StorageController'
 import { getTextFromMarkdown } from '../services/markdown'
-
-export interface ProjectInterface {
-  id: string
-  name: string
-  url: string
-  labels: string
-  cover: string
-  logo: string
-  images?: Array<any>
-  contents?: Array<any>
-  content: string
-  description: string
-}
 
 const [projectsID, sideID] = [
   '5f38107078c1558e6e2decc2',
@@ -105,46 +91,42 @@ class TrelloController {
     }
   }
 
-  async indexAllProjects(req: Request, res: Response) {
+  async indexAllProjects(req: FastifyRequest, res: FastifyReply) {
     try {
-      res.json(new Singleton().getInstance().getAllProjects())
+      return res.code(200).send({ data: new Singleton().getInstance().getAllProjects(), status: 200 })
     } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
+      return res.code(400).send({ error: e.message, status: 400 })
     }
   }
 
-  async indexAllSides(req: Request, res: Response) {
+  async indexAllSides(req: FastifyRequest, res: FastifyReply) {
     try {
-      res.json(new Singleton().getInstance().getAllSides())
+      return res.code(200).send({ data: new Singleton().getInstance().getAllSides(), status: 200 })
     } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
+      return res.code(400).send({ error: e.message, status: 400 })
     }
   }
 
-  async indexProject(req: Request, res: Response) {
-    const { id } = req.params
+  async indexProject(req: FastifyRequest, res: FastifyReply) {
+    const { id } = req.params as pingParamsTrello
     try {
-      res.json(new Singleton().getInstance().getProject(id))
+      return res.code(200).send({ data: new Singleton().getInstance().getProject(id), status: 200 })
     } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
+      return res.code(400).send({ error: e.message, status: 400 })
     }
   }
 
-  async indexSide(req: Request, res: Response) {
-    const { id } = req.params
+  async indexSide(req: FastifyRequest, res: FastifyReply) {
+    const { id } = req.params as pingParamsTrello
     try {
-      res.json(new Singleton().getInstance().getSide(id))
+      return res.code(200).send({ data: new Singleton().getInstance().getSide(id), status: 200 })
     } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
+      return res.code(400).send({ error: e.message, status: 400 })
     }
   }
 
-  async suggestProjects(req: Request, res: Response) {
-    const q = req.query
+  async suggestProjects(req: FastifyRequest, res: FastifyReply) {
+    const q = req.query as pingQueryTrello
     try {
       const data = new Singleton().getInstance().getAllProjects()
 
@@ -152,15 +134,14 @@ class TrelloController {
 
       const shuffle = _.shuffle(filter).slice(0, Number(q.suggestions) || 2)
 
-      res.json(shuffle)
+      return res.code(200).send({ data: shuffle, status: 200 })
     } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
+      return res.code(400).send({ error: e.message, status: 400 })
     }
   }
 
-  async suggestSides(req: Request, res: Response) {
-    const q = req.query
+  async suggestSides(req: FastifyRequest, res: FastifyReply) {
+    const q = req.query as pingQueryTrello
     try {
       const data = new Singleton().getInstance().getAllSides()
 
@@ -168,12 +149,35 @@ class TrelloController {
 
       const shuffle = _.shuffle(filter).slice(0, Number(q.suggestions) || 2)
 
-      res.json(shuffle)
+      return res.code(200).send({ data: shuffle, status: 200 })
     } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
+      return res.code(400).send({ error: e.message, status: 400 })
     }
   }
 }
 
 export default TrelloController
+
+export interface ProjectInterface {
+  id: string
+  name: string
+  url: string
+  labels: string
+  cover: string
+  logo: string
+  images?: Array<any>
+  contents?: Array<any>
+  content: string
+  description: string
+}
+
+export interface pingParamsTrello {
+  id: string
+}
+
+export interface pingQueryTrello {
+  suggestions?: number
+  id?: string
+}
+
+

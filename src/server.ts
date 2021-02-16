@@ -1,41 +1,137 @@
-import express, { Request, Response } from 'express'
-import morgan from 'morgan'
-import cors from 'cors'
-import helmet from 'helmet'
-import GithubControlller from './controllers/GithubControlller'
-import TrellosController from './controllers/TrelloController'
-import DevtoController from './controllers/DevtoController'
-import StorageController from './controllers/StorageController'
-;(async () => {
+import fastify, { FastifyInstance, RouteShorthandOptions } from 'fastify'
+import { IncomingMessage, Server, ServerResponse } from 'http'
+
+import GithubControlller, { pingParamsGitHub, pingQueryGitHub } from './controllers/GithubControlller'
+import DevtoController, { pingParamsDevto, pingQueryDevto } from './controllers/DevtoController'
+import TrelloController, { pingParamsTrello, pingQueryTrello } from './controllers/TrelloController'
+
+(async () => {
   const githubControlller = await GithubControlller.init()
   const devtoController = await DevtoController.init()
-  const trelloController = await TrellosController.init()
+  const trelloController = await TrelloController.init()
 
-  const app = express()
+  const server: FastifyInstance<Server, IncomingMessage, ServerResponse> = fastify({ logger: process.env['NODE_ENV'] != 'production' })
 
-  app.use(cors())
-  app.use(morgan('tiny'))
-  app.use(helmet())
+  const optsArray: RouteShorthandOptions = {
+    schema: {
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'array',
+            },
+            status: {
+              type: 'number',
+            },
+          },
+        },
+        400: {
+          type: 'object',
+          properties: {
+            status: {
+              type: 'number',
+            },
+            error: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    },
+  }
 
-  // TrellosController.getBoardList().then((r) => {})
+  const optsObject: RouteShorthandOptions = {
+    schema: {
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            data: {
+              type: 'object',
+              additionalProperties: true,
+            },
+            status: {
+              type: 'number',
+            },
+          },
+        },
+        400: {
+          type: 'object',
+          properties: {
+            status: {
+              type: 'number',
+            },
+            error: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    },
+  }
 
-  app
-    .get('/repos/', githubControlller.indexAllRepos)
-    .get('/sides/', trelloController.indexAllSides)
-    .get('/projects/', trelloController.indexAllProjects)
-    .get('/articles/', devtoController.indexAllArticles)
 
-    .get('/repos/:name', githubControlller.indexRepo)
-    .get('/sides/:id', trelloController.indexSide)
-    .get('/projects/:id', trelloController.indexProject)
-    .get('/articles/:id', devtoController.indexArticle)
+  server
+    // ALL
+    .get<{
+      Query: pingQueryGitHub,
+      Params: pingParamsGitHub
+    }>('/repos', optsArray, githubControlller.indexAllRepos)
+    .get<{
+      Query: pingQueryTrello,
+      Params: pingParamsTrello
+    }>('/sides', optsArray, trelloController.indexAllSides)
+    .get<{
+      Query: pingQueryTrello,
+      Params: pingParamsTrello
+    }>('/projects', optsArray, trelloController.indexAllProjects)
+    .get<{
+      Query: pingQueryDevto,
+      Params: pingParamsDevto
+    }>('/articles', optsArray, devtoController.indexAllArticles)
 
-    .get('/suggest/articles', devtoController.suggestArticles)
-    .get('/suggest/projects', trelloController.suggestProjects)
-    .get('/suggest/sides', trelloController.suggestSides)
-    .get('/suggest/repos', githubControlller.suggestRepos)
+    // ONE
+    .get<{
+      Query: pingQueryGitHub,
+      Params: pingParamsGitHub
+    }>('/repos/:name', optsObject, githubControlller.indexRepo)
+    .get<{
+      Query: pingQueryTrello,
+      Params: pingParamsTrello
+    }>('/sides/:id', optsObject, trelloController.indexSide)
+    .get<{
+      Query: pingQueryTrello,
+      Params: pingParamsTrello
+    }>('/projects/:id', optsObject, trelloController.indexProject)
+    .get<{
+      Query: pingQueryDevto,
+      Params: pingParamsDevto
+    }>('/articles/:id', optsObject, devtoController.indexArticle)
 
-  app.listen(process.env.PORT || 3333, () => {
-    console.log(`Server running at ${process.env.PORT || 3333}`)
+    // SUGGESTIONS
+    .get<{
+      Query: pingQueryDevto,
+      Params: pingParamsDevto
+    }>('/suggest/articles', devtoController.suggestArticles)
+    .get<{
+      Query: pingQueryTrello,
+      Params: pingParamsTrello
+    }>('/suggest/projects', trelloController.suggestProjects)
+    .get<{
+      Query: pingQueryTrello,
+      Params: pingParamsTrello
+    }>('/suggest/sides', trelloController.suggestSides)
+    .get<{
+      Query: pingQueryGitHub,
+      Params: pingParamsGitHub
+    }>('/suggest/repos', optsArray, githubControlller.suggestRepos)
+
+  server.listen(process.env.PORT || 3333, (err, address) => {
+    if (err) {
+      console.error(err)
+      process.exit(0)
+    }
+    console.log(`Server listening at ${address}`)
   })
 })()

@@ -1,25 +1,14 @@
-import { Request, Response } from 'express'
+import { FastifyReply, FastifyRequest } from 'fastify'
 import { gitAPI } from '../services/api'
+import Singleton from '../database/TempDatabase'
+import StorageController from './StorageController'
 import axios from 'axios'
 // @ts-ignore
 import _ from 'lodash'
-import Singleton from '../database/TempDatabase'
-import StorageController from './StorageController'
+
 
 const { GITHUB_USERNAME } = process.env
 
-export interface RepositoryInterface {
-  name: string
-  description: string
-  stargazers: number
-  url: string
-  clone_url: string
-  languages?: []
-  topics?: []
-  size?: number
-  read_me?: string
-  updated_at: string
-}
 
 class GithubControlller {
   static async init() {
@@ -69,8 +58,8 @@ class GithubControlller {
     } as RepositoryInterface
   }
 
-  async suggestRepos(req: Request, res: Response) {
-    const q = req.query
+  async suggestRepos(req: FastifyRequest, res: FastifyReply) {
+    const q = req.query as pingQueryGitHub
     try {
       const data = new Singleton().getInstance().getAllRepos()
 
@@ -81,14 +70,13 @@ class GithubControlller {
         Number(q.suggestions) || 2,
       ) as RepositoryInterface[]
 
-      return res.json(shuffle)
+      return res.code(200).send({ data: shuffle, status: 200 })
     } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
+      return res.code(400).send({ error: e.message, status: 400 })
     }
   }
 
-  async indexAllRepos(req: Request, res: Response) {
+  async indexAllRepos(req: FastifyRequest, res: FastifyReply) {
     try {
       const repos = new Singleton().getInstance().getAllRepos()
 
@@ -103,21 +91,44 @@ class GithubControlller {
         return 0
       })
 
-      res.json(sortedRepos)
+      return res.code(200).send({ data: sortedRepos, status: 200 })
     } catch (e) {
-      return res.status(400).json({ error: e.message })
+      return res.code(400).send({ error: e.message, status: 400 })
     }
   }
 
-  async indexRepo(req: Request, res: Response) {
-    const { name } = req.params
+  async indexRepo(req: FastifyRequest, res: FastifyReply) {
+    const { name } = req.params as pingParamsGitHub
     try {
-      return res.json(new Singleton().getInstance().getRepo(name))
+      let repo = new Singleton().getInstance().getRepo(name)
+
+      return res.code(200).send({ data: repo, status: 200 })
     } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
+      return res.status(400).send({ error: e.message, status: 400 })
     }
   }
 }
 
 export default GithubControlller
+
+export interface RepositoryInterface {
+  name: string
+  description: string
+  stargazers: number
+  url: string
+  clone_url: string
+  languages?: []
+  topics?: []
+  size?: number
+  read_me?: string
+  updated_at: string
+}
+
+export interface pingParamsGitHub {
+  name: string
+}
+
+export interface pingQueryGitHub {
+  suggestions?: number
+  name?: string
+}

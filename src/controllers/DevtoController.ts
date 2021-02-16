@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { FastifyReply, FastifyRequest } from 'fastify'
 import { devtoAPI } from '../services/api'
 // @ts-ignore
 import _ from 'lodash'
@@ -6,19 +6,6 @@ import Singleton from '../database/TempDatabase'
 import StorageController from './StorageController'
 
 devtoAPI.defaults.headers['api-key'] = process.env.DEVTO_TOKEN
-
-export interface ArticleInterface {
-  title: string
-  description: string
-  published_at: string
-  tags: Array<any>
-  url: string
-  edited_at: string
-  id: string
-  reactions: number
-  cover: string
-  content: string
-}
 
 export default class DevtoController {
   static async init() {
@@ -58,8 +45,7 @@ export default class DevtoController {
     } as ArticleInterface
   }
 
-  async indexAllArticles(req: Request, res: Response) {
-    const q = req.query
+  async indexAllArticles(req: FastifyRequest, res: FastifyReply) {
     try {
       let data = (await devtoAPI.get('articles/me/published')).data
 
@@ -84,25 +70,23 @@ export default class DevtoController {
         }
       })
 
-      return res.json(articles)
+      return res.code(200).send({ data: articles, status: 200 })
     } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
+      return res.code(400).send({ error: e.message, status: 400 })
     }
   }
 
-  async indexArticle(req: Request, res: Response) {
-    const { id } = req.params
+  async indexArticle(req: FastifyRequest, res: FastifyReply) {
+    const { id } = req.params as pingParamsDevto
     try {
-      res.json(await DevtoController.getOneArticle(id))
+      return res.code(200).send({ data: await DevtoController.getOneArticle(id), status: 200 })
     } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
+      return res.code(400).send({ error: e.message, status: 400 })
     }
   }
 
-  async suggestArticles(req: Request, res: Response) {
-    const q = req.query
+  async suggestArticles(req: FastifyRequest, res: FastifyReply) {
+    const q = req.query as pingQueryDevto
     try {
       const data = (await devtoAPI.get('articles/me/published')).data
 
@@ -133,10 +117,31 @@ export default class DevtoController {
         }
       })
 
-      return res.json(articles)
+      return res.code(200).send({ data: articles, status: 200 })
     } catch (e) {
-      console.log(e)
-      return res.status(400).json({ error: e.message })
+      return res.code(400).send({ error: e.message, status: 400 })
     }
   }
+}
+
+export interface ArticleInterface {
+  title: string
+  description: string
+  published_at: string
+  tags: Array<any>
+  url: string
+  edited_at: string
+  id: string
+  reactions: number
+  cover: string
+  content: string
+}
+
+export interface pingParamsDevto {
+  id: string
+}
+
+export interface pingQueryDevto {
+  suggestions?: number
+  id?: string
 }

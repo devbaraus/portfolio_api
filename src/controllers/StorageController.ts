@@ -1,7 +1,6 @@
 import TempDatabase from '../database/TempDatabase'
-import { Request, Response } from 'express'
 import { devtoAPI, gitAPI, trelloAPI } from '../services/api'
-import TrelloController, { ProjectInterface } from './TrelloController'
+import TrelloController from './TrelloController'
 import DevtoController from './DevtoController'
 import GithubControlller from './GithubControlller'
 
