@@ -6,8 +6,6 @@ import DevtoController, { pingParamsDevto, pingQueryDevto } from './controllers/
 import TrelloController, { pingParamsTrello, pingQueryTrello } from './controllers/TrelloController'
 
 (async () => {
-  console.log(process.env.PORT || 3333);
-
   const githubControlller = await GithubControlller.init()
   const devtoController = await DevtoController.init()
   const trelloController = await TrelloController.init()
@@ -129,7 +127,7 @@ import TrelloController, { pingParamsTrello, pingQueryTrello } from './controlle
       Params: pingParamsGitHub
     }>('/suggest/repos', optsArray, githubControlller.suggestRepos)
 
-  server.listen(process.env.PORT || 3333, (err, address) => {
+  server.listen(process.env.PORT || 3333, '0.0.0.0', (err, address) => {
     if (err) {
       console.error(err)
       process.exit(0)
