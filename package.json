@@ -14,7 +14,7 @@
     "@types/jsdom": "^16.2.4",
     "@types/lodash": "^4.14.159",
     "@types/showdown": "^1.9.3",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "ts-node-dev": "^1.0.0-pre.57",
     "typescript": "^3.9.7"
   },
